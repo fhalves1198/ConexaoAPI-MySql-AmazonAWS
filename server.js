@@ -6,28 +6,36 @@ const cors = require("cors");
 app.use(cors());
 
 // Configurações de conexão com o banco de dados MySQL
+/*
 const connection = mysql.createConnection({
-  host: "db4free.net",
+  host: "database-1.cxpaobbrsntr.us-east-2.rds.amazonaws.com",
   port: 3306,
-  user: "fabinhuui9",
-  password: "Tunado98@@",
-  database: "projectbasee"
+  user: "admin",
+  password: "Tunado98",
+  database: "project",
+  autoReconnect: true, // Ativa a reconexão automática
+  reconnectDelay: 2000 
 });
+*/
+
 
 // Conectar ao banco de dados MySQL
-connection.connect((err) => {
-  if (err) {
-    console.error("Erro ao conectar ao banco de dados:", err);
-    return;
-  }
-  console.log("Conexão bem-sucedida ao banco de dados.");
+// Conectar ao banco de dados MySQL
+const pool = mysql.createPool({
+    host: "database-1.cxpaobbrsntr.us-east-2.rds.amazonaws.com",
+    port: 3306,
+    user: "admin",
+    password: "Tunado98",
+    database: "project",
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+  });
+// Defina suas rotas aqui
 
-  // Defina suas rotas aqui
-
-  app.listen("3000", () => {
+app.listen("3000", () => {
     console.log("Servidor iniciado na porta 3000.");
   });
-});
 
 // Middleware para adicionar o cabeçalho 'Access-Control-Allow-Origin'
 app.use((req, res, next) => {
@@ -41,7 +49,7 @@ app.use(express.json());
 app.route("/cadastro").post((req, res) => {
   const { email, senha } = req.body;
   const query = "INSERT INTO cadastro (email, senha) VALUES (?, ?)";
-  connection.query(query, [email, senha], (err, results) => {
+  pool.query(query, [email, senha], (err, results) => {
     if (err) {
       console.error(err);
       res.status(500).send("Erro ao cadastrar usuário.");
@@ -51,3 +59,19 @@ app.route("/cadastro").post((req, res) => {
     }
   });
 });
+app.route("/login").post((req, res) => {
+    const { email, senha } = req.body;
+    const query = "SELECT * FROM cadastro WHERE email = ? AND senha = ?";
+    pool.query(query, [email, senha], (err, results) => {
+        if (err){
+            console.log(err)
+            res.status(500).send("Usuário não encontrado")
+        } else if(results.length > 0) {
+            res.status(200).send("Logado com sucesso!")
+            console.log(req.body)
+        } else {
+            res.status(401).send("Credenciais inválidas.");
+        }
+    })
+
+})
