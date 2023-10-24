@@ -5,27 +5,13 @@ const cors = require("cors");
 
 app.use(cors());
 
-// Configurações de conexão com o banco de dados MySQL
-/*
-const connection = mysql.createConnection({
-  host: "database-1.cxpaobbrsntr.us-east-2.rds.amazonaws.com",
-  port: 3306,
-  user: "admin",
-  password: "Tunado98",
-  database: "project",
-  autoReconnect: true, // Ativa a reconexão automática
-  reconnectDelay: 2000 
-});
-*/
 
-
-// Conectar ao banco de dados MySQL
 // Conectar ao banco de dados MySQL
 const pool = mysql.createPool({
     host: "database-1.cxpaobbrsntr.us-east-2.rds.amazonaws.com",
     port: 3306,
-    user: "admin",
-    password: "Tunado98",
+    user: "xxxx",
+    password: "xxxx",
     database: "project",
     waitForConnections: true,
     connectionLimit: 10,
